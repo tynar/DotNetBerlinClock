@@ -63,7 +63,7 @@ namespace BerlinClock.Classes
                 throw new ArgumentException("Hours cannot be parsed.");
             }
 
-            if (hoursTemp < 0 || hoursTemp > 59)
+            if (hoursTemp < 0 || hoursTemp > 24)
             {
                 throw new ArgumentOutOfRangeException(nameof(hours));
             }

@@ -72,6 +72,7 @@ namespace BerlinClock.Tests.UnitTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void Throws_Exception_On_Out_Of_Bounds_Hour()
         {
             //Max hour is 24, upper hours are 4 * 5 = 20, lower hours are 4, total = 24
@@ -83,6 +84,7 @@ namespace BerlinClock.Tests.UnitTests
             {
                 Assert.IsTrue(e is ArgumentOutOfRangeException);
                 Assert.IsTrue(e.Message.Contains("hours"));
+                throw;
             }
 
             //Min hour is 0
@@ -94,6 +96,7 @@ namespace BerlinClock.Tests.UnitTests
             {
                 Assert.IsTrue(e is ArgumentOutOfRangeException);
                 Assert.IsTrue(e.Message.Contains("hours"));
+                throw;
             }
         }
 
@@ -106,6 +109,7 @@ namespace BerlinClock.Tests.UnitTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void Throws_Exception_On_Out_Of_Bounds_Minute()
         {
             //Max minute is 59, upper minutes are 11 * 5 = 55, lower minutes are 4, total = 59
@@ -117,6 +121,7 @@ namespace BerlinClock.Tests.UnitTests
             {
                 Assert.IsTrue(e is ArgumentOutOfRangeException);
                 Assert.IsTrue(e.Message.Contains("minutes"));
+                throw;
             }
 
             //Min minute is 0
@@ -128,6 +133,7 @@ namespace BerlinClock.Tests.UnitTests
             {
                 Assert.IsTrue(e is ArgumentOutOfRangeException);
                 Assert.IsTrue(e.Message.Contains("minutes"));
+                throw;
             }
         }
 
@@ -139,6 +145,7 @@ namespace BerlinClock.Tests.UnitTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void Throws_Exception_On_Out_Of_Bounds_Second()
         {
             //Max seconds are 59
@@ -150,6 +157,7 @@ namespace BerlinClock.Tests.UnitTests
             {
                 Assert.IsTrue(e is ArgumentOutOfRangeException);
                 Assert.IsTrue(e.Message.Contains("seconds"));
+                throw;
             }
 
             //Min second is 0
@@ -161,6 +169,7 @@ namespace BerlinClock.Tests.UnitTests
             {
                 Assert.IsTrue(e is ArgumentOutOfRangeException);
                 Assert.IsTrue(e.Message.Contains("seconds"));
+                throw;
             }
         }
 
