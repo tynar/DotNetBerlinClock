@@ -8,23 +8,25 @@ namespace BerlinClock.Classes
 {
     public class BerlinUhrClock
     {
-        private int hours, minutes, seconds;
+        /// <summary>
+        /// Integer value to represent hours.
+        /// </summary>
+        public int Hours { get; private set; }
 
-        public int Hours
-        {
-            get { return hours; }
-        }
+        /// <summary>
+        /// Integer value to represent minutes.
+        /// </summary>
+        public int Minutes { get; private set; }
 
-        public int Minutes
-        {
-            get { return minutes; }
-        }
+        /// <summary>
+        /// Integer value to represent seconds.
+        /// </summary>
+        public int Seconds { get; private set; }
 
-        public int Seconds
-        {
-            get { return seconds; }
-        }
-
+        /// <summary>
+        /// Creates an instance of BerlinUhrClock class.
+        /// </summary>
+        /// <param name="aTime">String representaion of a time in HH:mm:ss format, e.g. 14:20:20</param>
         public BerlinUhrClock(string aTime)
         {
             var splitted = aTime.Split(':');
@@ -35,6 +37,11 @@ namespace BerlinClock.Classes
             ParseSeconds(splitted[2]);
         }
 
+        /// <summary>
+        /// Validates a time splitted into array, where first element is hours, second is minutes and third is seconds. 
+        /// Throws exception when structure is not correct.
+        /// </summary>
+        /// <param name="times">An array of string which is formed by splitting time representation by ':' character.</param>
         private static void ValidateArgument(string[] times)
         {
             if (times == null || times.Length == 0) throw new ArgumentNullException(nameof(times));
@@ -44,6 +51,10 @@ namespace BerlinClock.Classes
             }
         }
 
+        /// <summary>
+        /// Parses hours and sets to private member hours.
+        /// </summary>
+        /// <param name="hours">String representation of hours.</param>
         private void ParseHours(string hours)
         {
             int hoursTemp;
@@ -56,9 +67,13 @@ namespace BerlinClock.Classes
             {
                 throw new ArgumentOutOfRangeException(nameof(hours));
             }
-            this.hours = hoursTemp;
+            this.Hours = hoursTemp;
         }
 
+        /// <summary>
+        /// Parses minutes and sets to private member minutes.
+        /// </summary>
+        /// <param name="minutes">String representation of minutes.</param>
         private void ParseMinutes(string minutes)
         {
             int minutesTemp;
@@ -71,9 +86,13 @@ namespace BerlinClock.Classes
             {
                 throw new ArgumentOutOfRangeException(nameof(minutes));
             }
-            this.minutes = minutesTemp;
+            this.Minutes = minutesTemp;
         }
 
+        /// <summary>
+        /// Parses seconds and sets to private member seconds.
+        /// </summary>
+        /// <param name="seconds">String representation of seconds.</param>
         private void ParseSeconds(string seconds)
         {
             int secondsTemp;
@@ -86,9 +105,14 @@ namespace BerlinClock.Classes
             {
                 throw new ArgumentOutOfRangeException(nameof(seconds));
             }
-            this.seconds = secondsTemp;
+            this.Seconds = secondsTemp;
         }
 
+        /// <summary>
+        /// Overrides ToString method. Representation of clock in Berlin Uhr format. For more description go to
+        /// site https://github.com/mazhewitt/DotNetBerlinClock/blob/master/Readme.md
+        /// </summary>
+        /// <returns>String representation of clock in Berlin Uhr format.</returns>
         public override string ToString()
         {
             /*
@@ -108,20 +132,31 @@ namespace BerlinClock.Classes
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(GetSecondsRow());
-            sb.AppendLine(ComposeLampsRow(hours / 5, 4, 'R'));
-            sb.AppendLine(ComposeLampsRow(hours % 5, 4, 'R'));
-            string minuteLamps = ComposeLampsRow(minutes / 5, 11, 'Y');
+            sb.AppendLine(ComposeLampsRow(Hours / 5, 4, 'R'));
+            sb.AppendLine(ComposeLampsRow(Hours % 5, 4, 'R'));
+            string minuteLamps = ComposeLampsRow(Minutes / 5, 11, 'Y');
             //Replacing each third yellow lamp with red lamp
             sb.AppendLine(minuteLamps.Replace("YYY", "YYR"));
-            sb.Append(ComposeLampsRow(minutes % 5, 4, 'Y'));
+            sb.Append(ComposeLampsRow(Minutes % 5, 4, 'Y'));
             return sb.ToString();
         }
 
+        /// <summary>
+        /// String representation of seconds lamp.
+        /// </summary>
+        /// <returns>String containing 'Y' when seconds are even 'O' for odd.</returns>
         private string GetSecondsRow()
         {
-            return seconds % 2 == 0 ? "Y" : "O";
+            return Seconds % 2 == 0 ? "Y" : "O";
         }
 
+        /// <summary>
+        /// String representation of lamps in a row. Fills row with the number of turned on lamps and then fills with empty lamps remaining ones in a row.
+        /// </summary>
+        /// <param name="turnedOnLamps">Count of lamps to be turned on.</param>
+        /// <param name="totalLampsCount">Total number of lamps in a row.</param>
+        /// <param name="lampColor">Character representing lamp's color. E.g. 'Y' - yellow, 'R' - red, 'O' - off.</param>
+        /// <returns></returns>
         private string ComposeLampsRow(int turnedOnLamps, int totalLampsCount, char lampColor)
         {
             return new string(lampColor, turnedOnLamps).PadRight(totalLampsCount, 'O');
