@@ -10,7 +10,7 @@ namespace BerlinClock
     {
         public string convertTime(string aTime)
         {
-            BerlinUhrClock clock = new BerlinUhrClock(aTime);
+            BerlinUhrClock clock = BerlinUhrClock.Parse(aTime);
             return clock.ToString();
         }
     }

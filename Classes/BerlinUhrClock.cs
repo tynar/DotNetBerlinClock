@@ -2,110 +2,79 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace BerlinClock.Classes
 {
-    public class BerlinUhrClock
+    public struct BerlinUhrClock
     {
-        /// <summary>
-        /// Integer value to represent hours.
-        /// </summary>
-        public int Hours { get; private set; }
+        public const int TicksPerSecond = 1;
+        public const int TicksPerMinute = TicksPerSecond * 60;
+        public const int TicksPerHour = TicksPerMinute * 60;
 
-        /// <summary>
-        /// Integer value to represent minutes.
-        /// </summary>
-        public int Minutes { get; private set; }
+        public const int MaxSeconds = 25 * TicksPerHour - TicksPerSecond; // max hour is 24:59:59 or 25:00:00 - 1 second
 
-        /// <summary>
-        /// Integer value to represent seconds.
-        /// </summary>
-        public int Seconds { get; private set; }
+        private int _ticks;
 
-        /// <summary>
-        /// Creates an instance of BerlinUhrClock class.
-        /// </summary>
-        /// <param name="aTime">String representaion of a time in HH:mm:ss format, e.g. 14:20:20</param>
-        public BerlinUhrClock(string aTime)
+        public BerlinUhrClock(int hours, int minutes, int seconds)
         {
-            var splitted = aTime.Split(':');
-            ValidateArgument(splitted);
-
-            ParseHours(splitted[0]);
-            ParseMinutes(splitted[1]);
-            ParseSeconds(splitted[2]);
+            _ticks = TimeToTicks(hours, minutes, seconds);
         }
 
-        /// <summary>
-        /// Validates a time splitted into array, where first element is hours, second is minutes and third is seconds. 
-        /// Throws exception when structure is not correct.
-        /// </summary>
-        /// <param name="times">An array of string which is formed by splitting time representation by ':' character.</param>
-        private static void ValidateArgument(string[] times)
+        public static BerlinUhrClock Parse(string time)
         {
-            if (times == null || times.Length == 0) throw new ArgumentNullException(nameof(times));
-            if (times.Length != 3)
+            if (string.IsNullOrEmpty(time))
             {
-                throw new ArgumentException("Given time cannot parsed, please use format HH:mm:ss, e.g. 14:04:20.");
+                throw new ArgumentNullException(nameof(time));
+            }
+
+            Regex regex = new Regex(@"^(?:([01]?\d|2[0-4]):([0-5]?\d):)?([0-5]?\d)$");
+            //[01]?\d|2[0-4] - can start with 0 or 1 and second character can be 0-4
+            //[0-5]?\d - can start from 0 to 5 and second character is digit
+            //[0-5]?\d - can start from 0 to 5 and second character is digit
+
+            var match = regex.Match(time);
+            if (!match.Success)
+            {
+                throw new ArgumentException("Illegal time, please input in HH:mm:ss format.");
+            }
+
+            int hours = Convert.ToInt32(match.Groups[1].Value); //hour
+            int minutes = Convert.ToInt32(match.Groups[2].Value); //minute
+            int seconds = Convert.ToInt32(match.Groups[3].Value); //second
+
+            return new BerlinUhrClock(hours, minutes, seconds);
+        }
+
+        private static int TimeToTicks(int hours, int minutes, int seconds)
+        {
+            int totalSeconds = hours * 60 * 60 + minutes * 60 + seconds;
+            if (totalSeconds > MaxSeconds || totalSeconds < 0)
+            {
+                throw new ArgumentOutOfRangeException(null, "Give time is too long.");
+            }
+            return TicksPerSecond * totalSeconds;
+        }
+
+        public int Hours
+        {
+            get
+            {
+                int hours = _ticks / TicksPerHour;
+                if (hours % 24 == 0 && hours != 0) return 24; //return 24 for 24. In "Berlin Clock" it can go up to 24:59:59
+                return hours % 24;
             }
         }
 
-        /// <summary>
-        /// Parses hours and sets to private member hours.
-        /// </summary>
-        /// <param name="hours">String representation of hours.</param>
-        private void ParseHours(string hours)
+        public int Minutes
         {
-            int hoursTemp;
-            if (!int.TryParse(hours, out hoursTemp))
-            {
-                throw new ArgumentException("Hours cannot be parsed.");
-            }
-
-            if (hoursTemp < 0 || hoursTemp > 24)
-            {
-                throw new ArgumentOutOfRangeException(nameof(hours));
-            }
-            this.Hours = hoursTemp;
+            get { return _ticks / TicksPerMinute % 60; }
         }
 
-        /// <summary>
-        /// Parses minutes and sets to private member minutes.
-        /// </summary>
-        /// <param name="minutes">String representation of minutes.</param>
-        private void ParseMinutes(string minutes)
+        public int Seconds
         {
-            int minutesTemp;
-            if (!int.TryParse(minutes, out minutesTemp))
-            {
-                throw new ArgumentException("Minutes cannot be parsed.");
-            }
-
-            if (minutesTemp < 0 || minutesTemp > 59)
-            {
-                throw new ArgumentOutOfRangeException(nameof(minutes));
-            }
-            this.Minutes = minutesTemp;
-        }
-
-        /// <summary>
-        /// Parses seconds and sets to private member seconds.
-        /// </summary>
-        /// <param name="seconds">String representation of seconds.</param>
-        private void ParseSeconds(string seconds)
-        {
-            int secondsTemp;
-            if (!int.TryParse(seconds, out secondsTemp))
-            {
-                throw new ArgumentException("Seconds cannot be parsed.");
-            }
-
-            if (secondsTemp < 0 || secondsTemp > 59)
-            {
-                throw new ArgumentOutOfRangeException(nameof(seconds));
-            }
-            this.Seconds = secondsTemp;
+            get { return _ticks / TicksPerSecond % 60; }
         }
 
         /// <summary>
